@@ -6,610 +6,598 @@
   <title>SENEX · PUER · CYCLICA</title>
   <style>
     :root {
-      --senex: #c73636;
-      --puer: #d6a329;
-      --cyclica: #2f76d2;
-      --paper: #fff7c8;
-      --ink: #1f1f1f;
-      --bg: #f4f1ea;
-      --panel: rgba(255, 255, 255, 0.82);
-      --shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+      --bg: #f3f0e8;
+      --surface: #fbfaf6;
+      --ink: #22201c;
+      --muted: #7d766b;
+      --line: rgba(34, 32, 28, 0.14);
+      --senex: #c83a3f;
+      --puer: #d9a92e;
+      --cyclica: #2f7fd7;
+      --note: #fff4a9;
+      --shadow: 0 7px 18px rgba(28, 24, 18, 0.14);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html, body {
       margin: 0;
-      min-height: 100%;
-      font-family: ui-serif, Georgia, "Times New Roman", serif;
-      background:
-        radial-gradient(circle at top left, rgba(215, 163, 41, 0.10), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(47, 118, 210, 0.10), transparent 32%),
-        var(--bg);
-      color: var(--ink);
+      width: 100%;
+      height: 100%;
       overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
     }
 
-    .app {
-      height: 100vh;
+    body {
       display: grid;
-      grid-template-rows: auto 1fr;
+      grid-template-rows: 58px 1fr;
     }
 
     header {
-      padding: 14px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      background: rgba(244, 241, 234, 0.88);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(31, 31, 31, 0.12);
-      z-index: 10;
+      gap: 18px;
+      padding: 9px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(251, 250, 246, 0.93);
+      backdrop-filter: blur(12px);
+      z-index: 20;
     }
 
-    .title {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+    .brand {
+      min-width: 250px;
     }
 
     h1 {
-      font-size: 19px;
-      letter-spacing: 0.12em;
       margin: 0;
+      font-size: 18px;
+      line-height: 1;
+      letter-spacing: 0.17em;
       font-weight: 700;
+      white-space: nowrap;
     }
 
     .subtitle {
+      margin-top: 6px;
       font-size: 13px;
-      opacity: 0.7;
+      line-height: 1;
+      color: var(--muted);
+      white-space: nowrap;
     }
 
     .toolbar {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      align-items: center;
       justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: nowrap;
     }
 
-    button, label.import-label {
-      border: 1px solid rgba(31, 31, 31, 0.22);
-      background: rgba(255, 255, 255, 0.72);
+    button, .file-button {
+      height: 34px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 9px 13px;
-      font-family: inherit;
+      background: #fffdf8;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
       font-size: 14px;
       cursor: pointer;
-      color: var(--ink);
-      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+      box-shadow: 0 1px 2px rgba(28, 24, 18, 0.04);
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
       user-select: none;
     }
 
-    button:hover, label.import-label:hover {
+    button:hover, .file-button:hover {
       transform: translateY(-1px);
+      border-color: rgba(34, 32, 28, 0.32);
       background: white;
-      border-color: rgba(31, 31, 31, 0.35);
     }
 
     button.danger:hover {
-      border-color: rgba(199, 54, 54, 0.8);
-      color: #9b1e1e;
+      color: #a52126;
+      border-color: rgba(200, 58, 63, 0.55);
     }
 
-    input[type="file"] {
-      display: none;
-    }
+    input[type="file"] { display: none; }
 
-    main {
+    #stage {
       position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(217,169,46,.07), transparent 38%),
+        radial-gradient(circle at 80% 100%, rgba(47,127,215,.08), transparent 40%),
+        var(--bg);
+    }
+
+    #board {
+      position: absolute;
+      inset: 0;
       overflow: hidden;
       touch-action: none;
     }
 
-    .board {
-      position: absolute;
-      inset: 0;
-      min-width: 920px;
-      min-height: 620px;
-    }
-
-    svg.venn {
+    svg {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      overflow: visible;
       pointer-events: none;
     }
 
-    .circle-outline {
+    .circle {
       fill: transparent;
-      stroke-width: 5;
+      stroke-width: 4.2;
       vector-effect: non-scaling-stroke;
-      opacity: 0.86;
+      opacity: .92;
     }
 
-    .circle-label {
-      font-family: ui-serif, Georgia, "Times New Roman", serif;
-      font-size: 24px;
+    .label {
+      font-size: 20px;
       font-weight: 700;
-      letter-spacing: 0.14em;
-      dominant-baseline: middle;
+      letter-spacing: .18em;
       text-anchor: middle;
-      opacity: 0.92;
+      dominant-baseline: middle;
+      paint-order: stroke;
+      stroke: var(--bg);
+      stroke-width: 5px;
+      stroke-linejoin: round;
     }
 
-    .center-hint {
+    .subtle-grid line {
+      stroke: rgba(34,32,28,.035);
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .hint {
       position: absolute;
       left: 50%;
-      top: 54%;
+      top: 48%;
       transform: translate(-50%, -50%);
+      width: min(420px, 64vw);
+      color: rgba(34, 32, 28, .28);
       text-align: center;
-      width: min(420px, 70vw);
-      opacity: 0.34;
-      font-size: 18px;
-      line-height: 1.4;
+      font-size: 16px;
+      line-height: 1.35;
       pointer-events: none;
+      user-select: none;
     }
 
     .note {
       position: absolute;
-      width: 170px;
-      min-height: 104px;
-      padding: 12px 12px 30px;
-      background: var(--paper);
-      border-radius: 10px 10px 18px 10px;
+      width: 118px;
+      min-height: 72px;
+      border: 2px solid rgba(34, 32, 28, .16);
+      border-radius: 7px 7px 12px 7px;
+      background: var(--note);
       box-shadow: var(--shadow);
+      transform: rotate(var(--r));
       cursor: grab;
       user-select: none;
       touch-action: none;
-      border: 3px solid transparent;
-      outline: 1px solid rgba(31, 31, 31, 0.08);
-      transform: rotate(var(--rotation, -1deg));
-      transition: box-shadow 120ms ease, border-color 120ms ease, background 160ms ease;
+      overflow: hidden;
     }
 
-    .note:active {
-      cursor: grabbing;
-    }
+    .note:active { cursor: grabbing; }
 
     .note.selected {
-      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.20);
-      outline: 2px solid rgba(31, 31, 31, 0.28);
-      z-index: 50 !important;
+      outline: 2px solid rgba(34, 32, 28, .36);
+      outline-offset: 2px;
+      z-index: 9999 !important;
     }
 
     .note textarea {
+      display: block;
       width: 100%;
+      height: 100%;
       min-height: 70px;
+      padding: 10px 20px 16px 10px;
       border: 0;
       outline: 0;
       resize: none;
       background: transparent;
-      font: 16px/1.32 ui-serif, Georgia, "Times New Roman", serif;
       color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 15px;
+      line-height: 1.18;
       overflow: hidden;
-      user-select: text;
       cursor: text;
     }
 
-    .note-meta {
+    .delete {
       position: absolute;
-      left: 12px;
-      right: 12px;
-      bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      opacity: 0.68;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-
-    .note button.delete-note {
-      position: absolute;
-      right: 7px;
-      top: 6px;
-      width: 22px;
-      height: 22px;
+      right: 3px;
+      top: 3px;
+      width: 19px;
+      height: 19px;
       padding: 0;
-      line-height: 18px;
-      font-size: 14px;
       border-radius: 50%;
-      opacity: 0;
-      background: rgba(255,255,255,0.65);
+      border: 1px solid rgba(34,32,28,.18);
+      background: rgba(255,255,255,.78);
+      color: rgba(34,32,28,.62);
+      font-size: 15px;
+      line-height: 16px;
+      box-shadow: none;
+      z-index: 4;
     }
 
-    .note:hover button.delete-note,
-    .note.selected button.delete-note {
-      opacity: 1;
-      pointer-events: auto;
+    .delete:hover {
+      transform: none;
+      color: #9c151b;
+      border-color: rgba(200,58,63,.6);
+      background: white;
+    }
+
+    .tag {
+      position: absolute;
+      left: 8px;
+      bottom: 4px;
+      max-width: calc(100% - 16px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 8px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(34,32,28,.52);
+      pointer-events: none;
     }
 
     .legend {
       position: absolute;
-      left: 18px;
-      bottom: 18px;
+      left: 14px;
+      bottom: 14px;
       display: flex;
+      align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
-      background: var(--panel);
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(251, 250, 246, .86);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(31, 31, 31, 0.12);
-      border-radius: 18px;
-      padding: 10px 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
-      z-index: 8;
-      max-width: calc(100vw - 36px);
+      box-shadow: 0 4px 12px rgba(28,24,18,.08);
+      font-size: 12px;
+      letter-spacing: .09em;
+      z-index: 10;
+      user-select: none;
     }
 
-    .legend-item {
+    .legend span {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      font-size: 13px;
-      letter-spacing: 0.06em;
+      gap: 5px;
     }
 
-    .dot {
-      width: 13px;
-      height: 13px;
+    .legend i {
+      display: block;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
       border: 2px solid currentColor;
-      background: transparent;
     }
 
     .status {
       position: absolute;
-      right: 18px;
-      bottom: 18px;
-      font-size: 13px;
-      opacity: 0.65;
-      background: var(--panel);
-      border: 1px solid rgba(31, 31, 31, 0.12);
-      border-radius: 18px;
-      padding: 10px 12px;
-      z-index: 8;
+      right: 14px;
+      bottom: 14px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(251, 250, 246, .86);
+      backdrop-filter: blur(8px);
+      color: var(--muted);
+      font-size: 12px;
+      z-index: 10;
+      user-select: none;
     }
 
     @media (max-width: 760px) {
-      html, body {
-        overflow: auto;
-      }
-
-      .app {
-        min-height: 100vh;
-      }
-
-      header {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .toolbar {
-        justify-content: flex-start;
-      }
-
-      main {
-        min-height: 720px;
-        overflow: auto;
-      }
-
-      .board {
-        height: 720px;
-      }
-
-      .status {
-        left: 18px;
-        right: auto;
-        bottom: 70px;
-      }
+      body { grid-template-rows: auto 1fr; overflow: auto; }
+      header { align-items: flex-start; flex-direction: column; }
+      .brand, h1, .subtitle { white-space: normal; }
+      .toolbar { flex-wrap: wrap; justify-content: flex-start; }
+      #stage { height: 760px; overflow: auto; }
+      #board { width: 920px; height: 700px; inset: auto; }
     }
   </style>
 </head>
+
 <body>
-  <div class="app">
-    <header>
-      <div class="title">
-        <h1>SENEX · PUER · CYCLICA</h1>
-        <div class="subtitle">Drag sticky notes into the circles. Overlaps blend characteristics.</div>
+  <header>
+    <div class="brand">
+      <h1>SENEX · PUER · CYCLICA</h1>
+      <div class="subtitle">Small draggable notes. Double-click empty space to create one.</div>
+    </div>
+
+    <div class="toolbar">
+      <button id="add">+ Note</button>
+      <button id="export">Export</button>
+      <label class="file-button" for="import">Import</label>
+      <input id="import" type="file" accept="application/json">
+      <button id="clear" class="danger">Clear</button>
+    </div>
+  </header>
+
+  <main id="stage">
+    <div id="board">
+      <svg id="venn" viewBox="0 0 1000 650" preserveAspectRatio="xMidYMid meet">
+        <g class="subtle-grid" id="grid"></g>
+
+        <circle id="senexShape" class="circle" cx="410" cy="295" r="180" stroke="var(--senex)" />
+        <circle id="puerShape" class="circle" cx="590" cy="295" r="180" stroke="var(--puer)" />
+        <circle id="cyclicaShape" class="circle" cx="500" cy="435" r="180" stroke="var(--cyclica)" />
+
+        <text class="label" x="340" y="148" fill="var(--senex)">SENEX</text>
+        <text class="label" x="660" y="148" fill="var(--puer)">PUER</text>
+        <text class="label" x="500" y="604" fill="var(--cyclica)">CYCLICA</text>
+      </svg>
+
+      <div class="hint" id="hint">Create a note and drag it into SENEX, PUER, CYCLICA, or their overlaps.</div>
+
+      <div class="legend">
+        <span style="color: var(--senex)"><i></i>SENEX</span>
+        <span style="color: var(--puer)"><i></i>PUER</span>
+        <span style="color: var(--cyclica)"><i></i>CYCLICA</span>
       </div>
-      <div class="toolbar">
-        <button id="addNote">+ Note</button>
-        <button id="exportData">Export</button>
-        <label class="import-label" for="importData">Import</label>
-        <input id="importData" type="file" accept="application/json" />
-        <button id="resetBoard" class="danger">Clear</button>
-      </div>
-    </header>
-
-    <main id="workspace">
-      <div class="board" id="board">
-        <svg class="venn" id="venn" viewBox="0 0 1000 680" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-          <circle id="senexCircle" class="circle-outline" cx="405" cy="300" r="205" stroke="var(--senex)" />
-          <circle id="puerCircle" class="circle-outline" cx="595" cy="300" r="205" stroke="var(--puer)" />
-          <circle id="cyclicaCircle" class="circle-outline" cx="500" cy="460" r="205" stroke="var(--cyclica)" />
-
-          <text class="circle-label" x="310" y="140" fill="var(--senex)">SENEX</text>
-          <text class="circle-label" x="690" y="140" fill="var(--puer)">PUER</text>
-          <text class="circle-label" x="500" y="625" fill="var(--cyclica)">CYCLICA</text>
-        </svg>
-
-        <div class="center-hint">Add a note, write an idea, then drag it into one or more circles.</div>
-
-        <div class="legend">
-          <span class="legend-item" style="color: var(--senex)"><span class="dot"></span>SENEX</span>
-          <span class="legend-item" style="color: var(--puer)"><span class="dot"></span>PUER</span>
-          <span class="legend-item" style="color: var(--cyclica)"><span class="dot"></span>CYCLICA</span>
-        </div>
-
-        <div class="status" id="status">Saved locally</div>
-      </div>
-    </main>
-  </div>
+      <div class="status" id="status">Saved</div>
+    </div>
+  </main>
 
   <script>
-    const STORAGE_KEY = "senex-puer-cyclica-board-v1";
-
+    const STORAGE_KEY = "senex-puer-cyclica-board-v2";
     const board = document.getElementById("board");
-    const workspace = document.getElementById("workspace");
+    const hint = document.getElementById("hint");
     const statusEl = document.getElementById("status");
 
     const circles = [
-      { key: "SENEX", color: "#c73636", cx: 405, cy: 300, r: 205 },
-      { key: "PUER", color: "#d6a329", cx: 595, cy: 300, r: 205 },
-      { key: "CYCLICA", color: "#2f76d2", cx: 500, cy: 460, r: 205 },
+      { key: "SENEX", color: "#c83a3f", cx: 410, cy: 295, r: 180 },
+      { key: "PUER", color: "#d9a92e", cx: 590, cy: 295, r: 180 },
+      { key: "CYCLICA", color: "#2f7fd7", cx: 500, cy: 435, r: 180 },
     ];
 
     let notes = [];
-    let selectedId = null;
-    let zCounter = 10;
+    let z = 20;
+    let selected = null;
 
-    function uid() {
-      return "note-" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    function id() {
+      return "n_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
     }
 
-    function clamp(value, min, max) {
-      return Math.max(min, Math.min(max, value));
-    }
-
-    function boardRect() {
-      return board.getBoundingClientRect();
-    }
-
-    function screenToVenn(x, y) {
-      const rect = boardRect();
-      const scaleX = 1000 / rect.width;
-      const scaleY = 680 / rect.height;
-      return {
-        x: (x - rect.left) * scaleX,
-        y: (y - rect.top) * scaleY
-      };
-    }
-
-    function noteCenterInVenn(noteEl) {
-      const rect = noteEl.getBoundingClientRect();
-      return screenToVenn(rect.left + rect.width / 2, rect.top + rect.height / 2);
-    }
-
-    function traitsForNote(noteEl) {
-      const p = noteCenterInVenn(noteEl);
-      return circles.filter(c => {
-        const dx = p.x - c.cx;
-        const dy = p.y - c.cy;
-        return Math.sqrt(dx * dx + dy * dy) <= c.r;
-      });
-    }
-
-    function describeTraits(traits) {
-      if (!traits.length) return "UNPLACED";
-      return traits.map(t => t.key).join(" · ");
-    }
-
-    function styleNoteByTraits(noteEl, traits) {
-      const meta = noteEl.querySelector(".note-meta span");
-      meta.textContent = describeTraits(traits);
-
-      if (traits.length === 0) {
-        noteEl.style.borderColor = "rgba(31,31,31,0.18)";
-        noteEl.style.background = "#fff7c8";
-        return;
-      }
-
-      if (traits.length === 1) {
-        const c = traits[0].color;
-        noteEl.style.borderColor = c;
-        noteEl.style.background = `linear-gradient(135deg, ${c}22, #fff7c8 46%, ${c}14)`;
-        return;
-      }
-
-      const colors = traits.map(t => t.color);
-      noteEl.style.borderColor = colors[0];
-      if (colors.length === 2) {
-        noteEl.style.background = `linear-gradient(135deg, ${colors[0]}2b, #fff7c8 44%, ${colors[1]}2b)`;
-      } else {
-        noteEl.style.background = `linear-gradient(135deg, ${colors[0]}2b, #fff7c8 33%, ${colors[1]}2b 64%, ${colors[2]}2b)`;
-      }
+    function randomRotation() {
+      return (Math.random() * 2.6 - 1.3).toFixed(2) + "deg";
     }
 
     function save() {
-      const data = notes.map(n => ({
-        id: n.id,
-        text: n.text,
-        x: n.x,
-        y: n.y,
-        z: n.z,
-        rotation: n.rotation
-      }));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      statusEl.textContent = "Saved locally";
-    }
-
-    function autosize(textarea) {
-      textarea.style.height = "auto";
-      textarea.style.height = Math.max(70, textarea.scrollHeight) + "px";
-    }
-
-    function updateNoteModel(id, patch) {
-      const n = notes.find(note => note.id === id);
-      if (!n) return;
-      Object.assign(n, patch);
-      save();
-    }
-
-    function createNoteElement(note) {
-      const el = document.createElement("div");
-      el.className = "note";
-      el.dataset.id = note.id;
-      el.style.left = note.x + "px";
-      el.style.top = note.y + "px";
-      el.style.zIndex = note.z;
-      el.style.setProperty("--rotation", `${note.rotation}deg`);
-
-      el.innerHTML = `
-        <button class="delete-note" title="Delete note">×</button>
-        <textarea spellcheck="true" placeholder="Write idea..."></textarea>
-        <div class="note-meta"><span>UNPLACED</span><span>drag</span></div>
-      `;
-
-      const textarea = el.querySelector("textarea");
-      textarea.value = note.text || "";
-      autosize(textarea);
-
-      textarea.addEventListener("input", () => {
-        autosize(textarea);
-        updateNoteModel(note.id, { text: textarea.value });
-      });
-
-      textarea.addEventListener("pointerdown", ev => {
-        ev.stopPropagation();
-      });
-
-      el.querySelector(".delete-note").addEventListener("click", ev => {
-        ev.stopPropagation();
-        deleteNote(note.id);
-      });
-
-      el.addEventListener("pointerdown", startDrag);
-
-      board.appendChild(el);
-      requestAnimationFrame(() => styleNoteByTraits(el, traitsForNote(el)));
-      return el;
-    }
-
-    function render() {
-      board.querySelectorAll(".note").forEach(el => el.remove());
-      notes.forEach(createNoteElement);
-      updateSelected();
-    }
-
-    function addNote(text = "") {
-      const rect = boardRect();
-      const note = {
-        id: uid(),
-        text,
-        x: clamp(rect.width / 2 - 85 + Math.random() * 40, 20, rect.width - 200),
-        y: clamp(rect.height / 2 - 55 + Math.random() * 40, 90, rect.height - 160),
-        z: ++zCounter,
-        rotation: Math.round((Math.random() * 4 - 2) * 10) / 10
-      };
-      notes.push(note);
-      createNoteElement(note);
-      selectedId = note.id;
-      updateSelected();
-      save();
-      const el = board.querySelector(`[data-id="${note.id}"] textarea`);
-      if (el) el.focus();
-    }
-
-    function deleteNote(id) {
-      notes = notes.filter(n => n.id !== id);
-      const el = board.querySelector(`[data-id="${id}"]`);
-      if (el) el.remove();
-      if (selectedId === id) selectedId = null;
-      save();
-    }
-
-    function updateSelected() {
-      board.querySelectorAll(".note").forEach(el => {
-        el.classList.toggle("selected", el.dataset.id === selectedId);
-      });
-    }
-
-    function startDrag(ev) {
-      if (ev.button !== undefined && ev.button !== 0) return;
-
-      const el = ev.currentTarget;
-      const id = el.dataset.id;
-      selectedId = id;
-      zCounter += 1;
-      el.style.zIndex = zCounter;
-      updateNoteModel(id, { z: zCounter });
-      updateSelected();
-
-      const note = notes.find(n => n.id === id);
-      const rect = boardRect();
-
-      const startX = ev.clientX;
-      const startY = ev.clientY;
-      const initialX = note.x;
-      const initialY = note.y;
-
-      el.setPointerCapture(ev.pointerId);
-
-      function move(moveEv) {
-        const dx = moveEv.clientX - startX;
-        const dy = moveEv.clientY - startY;
-        const newX = clamp(initialX + dx, 8, rect.width - el.offsetWidth - 8);
-        const newY = clamp(initialY + dy, 8, rect.height - el.offsetHeight - 8);
-
-        note.x = newX;
-        note.y = newY;
-        el.style.left = newX + "px";
-        el.style.top = newY + "px";
-        styleNoteByTraits(el, traitsForNote(el));
-        statusEl.textContent = describeTraits(traitsForNote(el));
-      }
-
-      function up() {
-        el.removeEventListener("pointermove", move);
-        el.removeEventListener("pointerup", up);
-        el.removeEventListener("pointercancel", up);
-        updateNoteModel(id, { x: note.x, y: note.y, z: zCounter });
-        styleNoteByTraits(el, traitsForNote(el));
-      }
-
-      el.addEventListener("pointermove", move);
-      el.addEventListener("pointerup", up);
-      el.addEventListener("pointercancel", up);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+      statusEl.textContent = "Saved";
+      hint.style.display = notes.length ? "none" : "block";
     }
 
     function load() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-          notes = [];
-          return;
-        }
-        const parsed = JSON.parse(raw);
-        notes = Array.isArray(parsed) ? parsed : [];
-        zCounter = notes.reduce((m, n) => Math.max(m, Number(n.z) || 10), 10);
+        notes = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(notes)) notes = [];
+        z = notes.reduce((max, n) => Math.max(max, Number(n.z) || 20), 20);
       } catch {
         notes = [];
       }
     }
 
-    function exportData() {
+    function boardPointToSvg(clientX, clientY) {
+      const svg = document.getElementById("venn");
+      const pt = svg.createSVGPoint();
+      pt.x = clientX;
+      pt.y = clientY;
+      const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+      return { x: p.x, y: p.y };
+    }
+
+    function traitsForElement(el) {
+      const rect = el.getBoundingClientRect();
+      const p = boardPointToSvg(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      return circles.filter(c => Math.hypot(p.x - c.cx, p.y - c.cy) <= c.r);
+    }
+
+    function traitText(traits) {
+      return traits.length ? traits.map(t => t.key).join(" · ") : "UNPLACED";
+    }
+
+    function styleByTraits(el) {
+      const traits = traitsForElement(el);
+      el.querySelector(".tag").textContent = traitText(traits);
+
+      if (traits.length === 0) {
+        el.style.borderColor = "rgba(34,32,28,.20)";
+        el.style.background = "#fff4a9";
+        return;
+      }
+
+      if (traits.length === 1) {
+        const c = traits[0].color;
+        el.style.borderColor = c;
+        el.style.background = `linear-gradient(135deg, ${c}25, #fff4a9 45%, ${c}12)`;
+        return;
+      }
+
+      const colors = traits.map(t => t.color);
+      el.style.borderColor = colors[0];
+
+      if (colors.length === 2) {
+        el.style.background = `linear-gradient(135deg, ${colors[0]}2f 0%, #fff4a9 48%, ${colors[1]}2f 100%)`;
+      } else {
+        el.style.background = `linear-gradient(135deg, ${colors[0]}2f 0%, #fff4a9 35%, ${colors[1]}2f 62%, ${colors[2]}2f 100%)`;
+      }
+    }
+
+    function autosize(textarea) {
+      textarea.style.height = "0px";
+      textarea.style.height = Math.max(70, textarea.scrollHeight) + "px";
+      const note = textarea.closest(".note");
+      if (note) note.style.minHeight = Math.max(72, textarea.scrollHeight + 18) + "px";
+    }
+
+    function updateNote(noteId, patch) {
+      const n = notes.find(x => x.id === noteId);
+      if (!n) return;
+      Object.assign(n, patch);
+      save();
+    }
+
+    function render() {
+      board.querySelectorAll(".note").forEach(n => n.remove());
+      notes.forEach(createNoteElement);
+      hint.style.display = notes.length ? "none" : "block";
+    }
+
+    function createNoteElement(n) {
+      const el = document.createElement("div");
+      el.className = "note";
+      el.dataset.id = n.id;
+      el.style.left = n.x + "px";
+      el.style.top = n.y + "px";
+      el.style.zIndex = n.z || 20;
+      el.style.setProperty("--r", n.r || "0deg");
+
+      const del = document.createElement("button");
+      del.className = "delete";
+      del.title = "Delete note";
+      del.textContent = "×";
+
+      const textarea = document.createElement("textarea");
+      textarea.value = n.text || "";
+      textarea.placeholder = "Idea";
+
+      const tag = document.createElement("div");
+      tag.className = "tag";
+      tag.textContent = "UNPLACED";
+
+      el.append(del, textarea, tag);
+      board.appendChild(el);
+
+      textarea.addEventListener("pointerdown", e => e.stopPropagation());
+      textarea.addEventListener("input", () => {
+        autosize(textarea);
+        updateNote(n.id, { text: textarea.value });
+        styleByTraits(el);
+      });
+
+      del.addEventListener("pointerdown", e => e.stopPropagation());
+      del.addEventListener("click", e => {
+        e.stopPropagation();
+        notes = notes.filter(x => x.id !== n.id);
+        if (selected === n.id) selected = null;
+        el.remove();
+        save();
+      });
+
+      el.addEventListener("pointerdown", beginDrag);
+      autosize(textarea);
+      requestAnimationFrame(() => styleByTraits(el));
+      return el;
+    }
+
+    function select(noteId) {
+      selected = noteId;
+      board.querySelectorAll(".note").forEach(el => {
+        el.classList.toggle("selected", el.dataset.id === selected);
+      });
+    }
+
+    function addNoteAt(x, y, text = "") {
+      const rect = board.getBoundingClientRect();
+      const n = {
+        id: id(),
+        text,
+        x: Math.max(8, Math.min(x, rect.width - 128)),
+        y: Math.max(8, Math.min(y, rect.height - 88)),
+        z: ++z,
+        r: randomRotation()
+      };
+      notes.push(n);
+      const el = createNoteElement(n);
+      select(n.id);
+      save();
+      el.querySelector("textarea").focus();
+      return n;
+    }
+
+    function beginDrag(e) {
+      if (e.button !== undefined && e.button !== 0) return;
+      const el = e.currentTarget;
+      const noteId = el.dataset.id;
+      const n = notes.find(x => x.id === noteId);
+      if (!n) return;
+
+      select(noteId);
+      n.z = ++z;
+      el.style.zIndex = n.z;
+
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const originX = n.x;
+      const originY = n.y;
+      const boardRect = board.getBoundingClientRect();
+
+      el.setPointerCapture(e.pointerId);
+
+      function move(ev) {
+        const maxX = boardRect.width - el.offsetWidth - 8;
+        const maxY = boardRect.height - el.offsetHeight - 8;
+        n.x = Math.max(8, Math.min(originX + ev.clientX - startX, maxX));
+        n.y = Math.max(8, Math.min(originY + ev.clientY - startY, maxY));
+        el.style.left = n.x + "px";
+        el.style.top = n.y + "px";
+        styleByTraits(el);
+        statusEl.textContent = el.querySelector(".tag").textContent;
+      }
+
+      function end() {
+        el.removeEventListener("pointermove", move);
+        el.removeEventListener("pointerup", end);
+        el.removeEventListener("pointercancel", end);
+        updateNote(noteId, { x: n.x, y: n.y, z: n.z });
+        styleByTraits(el);
+      }
+
+      el.addEventListener("pointermove", move);
+      el.addEventListener("pointerup", end);
+      el.addEventListener("pointercancel", end);
+    }
+
+    document.getElementById("add").addEventListener("click", () => {
+      const rect = board.getBoundingClientRect();
+      addNoteAt(rect.width / 2 - 59, rect.height / 2 - 36);
+    });
+
+    board.addEventListener("dblclick", e => {
+      if (e.target.closest(".note")) return;
+      const rect = board.getBoundingClientRect();
+      addNoteAt(e.clientX - rect.left - 59, e.clientY - rect.top - 36);
+    });
+
+    board.addEventListener("pointerdown", e => {
+      if (e.target === board || e.target.tagName.toLowerCase() === "svg") {
+        select(null);
+      }
+    });
+
+    document.getElementById("clear").addEventListener("click", () => {
+      if (!confirm("Delete every note on this board?")) return;
+      notes = [];
+      selected = null;
+      save();
+      render();
+    });
+
+    document.getElementById("export").addEventListener("click", () => {
       const payload = {
         app: "SENEX-PUER-CYCLICA",
-        version: 1,
+        version: 2,
         exportedAt: new Date().toISOString(),
         notes
       };
@@ -619,76 +607,52 @@
       a.download = "senex-puer-cyclica-board.json";
       a.click();
       URL.revokeObjectURL(a.href);
-    }
+    });
 
-    async function importData(file) {
+    document.getElementById("import").addEventListener("change", async e => {
+      const file = e.target.files[0];
       if (!file) return;
       try {
-        const text = await file.text();
-        const parsed = JSON.parse(text);
-        const imported = Array.isArray(parsed) ? parsed : parsed.notes;
-        if (!Array.isArray(imported)) throw new Error("No notes array found.");
-        notes = imported.map(n => ({
-          id: n.id || uid(),
+        const parsed = JSON.parse(await file.text());
+        const incoming = Array.isArray(parsed) ? parsed : parsed.notes;
+        if (!Array.isArray(incoming)) throw new Error("Invalid file.");
+        notes = incoming.map(n => ({
+          id: n.id || id(),
           text: String(n.text || ""),
-          x: Number(n.x) || 120,
-          y: Number(n.y) || 120,
-          z: Number(n.z) || ++zCounter,
-          rotation: Number(n.rotation) || 0
+          x: Number(n.x) || 50,
+          y: Number(n.y) || 50,
+          z: Number(n.z) || ++z,
+          r: n.r || randomRotation()
         }));
         save();
         render();
-      } catch (err) {
-        alert("Could not import this file. Make sure it is a valid exported board JSON.");
+      } catch {
+        alert("This import file is not valid.");
       }
-    }
-
-    document.getElementById("addNote").addEventListener("click", () => addNote());
-    document.getElementById("exportData").addEventListener("click", exportData);
-    document.getElementById("importData").addEventListener("change", ev => importData(ev.target.files[0]));
-    document.getElementById("resetBoard").addEventListener("click", () => {
-      const ok = confirm("Clear all notes from this board?");
-      if (!ok) return;
-      notes = [];
-      selectedId = null;
-      save();
-      render();
     });
 
-    workspace.addEventListener("pointerdown", ev => {
-      if (ev.target === workspace || ev.target === board) {
-        selectedId = null;
-        updateSelected();
+    window.addEventListener("keydown", e => {
+      const typing = document.activeElement && document.activeElement.tagName === "TEXTAREA";
+      if ((e.key === "Delete" || e.key === "Backspace") && selected && !typing) {
+        const el = board.querySelector(`[data-id="${selected}"]`);
+        notes = notes.filter(x => x.id !== selected);
+        if (el) el.remove();
+        selected = null;
+        save();
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "n") {
+        e.preventDefault();
+        const rect = board.getBoundingClientRect();
+        addNoteAt(rect.width / 2 - 59, rect.height / 2 - 36);
       }
     });
 
     window.addEventListener("resize", () => {
-      board.querySelectorAll(".note").forEach(el => styleNoteByTraits(el, traitsForNote(el)));
-    });
-
-    window.addEventListener("keydown", ev => {
-      if ((ev.key === "Delete" || ev.key === "Backspace") && selectedId) {
-        const active = document.activeElement;
-        if (active && active.tagName === "TEXTAREA") return;
-        deleteNote(selectedId);
-      }
-      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === "n") {
-        ev.preventDefault();
-        addNote();
-      }
+      board.querySelectorAll(".note").forEach(styleByTraits);
     });
 
     load();
     render();
-
-    if (notes.length === 0) {
-      addNote("Example idea");
-      const created = notes[0];
-      created.x = 420;
-      created.y = 280;
-      save();
-      render();
-    }
   </script>
 </body>
 </html>
