@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SENEX · PUER · CYCLICA</title>
+  <style>
+    :root {
+      --senex: #c73636;
+      --puer: #d6a329;
+      --cyclica: #2f76d2;
+      --paper: #fff7c8;
+      --ink: #1f1f1f;
+      --bg: #f4f1ea;
+      --panel: rgba(255, 255, 255, 0.82);
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top left, rgba(215, 163, 41, 0.10), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(47, 118, 210, 0.10), transparent 32%),
+        var(--bg);
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    header {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: rgba(244, 241, 234, 0.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(31, 31, 31, 0.12);
+      z-index: 10;
+    }
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    h1 {
+      font-size: 19px;
+      letter-spacing: 0.12em;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button, label.import-label {
+      border: 1px solid rgba(31, 31, 31, 0.22);
+      background: rgba(255, 255, 255, 0.72);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--ink);
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+      user-select: none;
+    }
+
+    button:hover, label.import-label:hover {
+      transform: translateY(-1px);
+      background: white;
+      border-color: rgba(31, 31, 31, 0.35);
+    }
+
+    button.danger:hover {
+      border-color: rgba(199, 54, 54, 0.8);
+      color: #9b1e1e;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    main {
+      position: relative;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .board {
+      position: absolute;
+      inset: 0;
+      min-width: 920px;
+      min-height: 620px;
+    }
+
+    svg.venn {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .circle-outline {
+      fill: transparent;
+      stroke-width: 5;
+      vector-effect: non-scaling-stroke;
+      opacity: 0.86;
+    }
+
+    .circle-label {
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      dominant-baseline: middle;
+      text-anchor: middle;
+      opacity: 0.92;
+    }
+
+    .center-hint {
+      position: absolute;
+      left: 50%;
+      top: 54%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      width: min(420px, 70vw);
+      opacity: 0.34;
+      font-size: 18px;
+      line-height: 1.4;
+      pointer-events: none;
+    }
+
+    .note {
+      position: absolute;
+      width: 170px;
+      min-height: 104px;
+      padding: 12px 12px 30px;
+      background: var(--paper);
+      border-radius: 10px 10px 18px 10px;
+      box-shadow: var(--shadow);
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      border: 3px solid transparent;
+      outline: 1px solid rgba(31, 31, 31, 0.08);
+      transform: rotate(var(--rotation, -1deg));
+      transition: box-shadow 120ms ease, border-color 120ms ease, background 160ms ease;
+    }
+
+    .note:active {
+      cursor: grabbing;
+    }
+
+    .note.selected {
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.20);
+      outline: 2px solid rgba(31, 31, 31, 0.28);
+      z-index: 50 !important;
+    }
+
+    .note textarea {
+      width: 100%;
+      min-height: 70px;
+      border: 0;
+      outline: 0;
+      resize: none;
+      background: transparent;
+      font: 16px/1.32 ui-serif, Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      overflow: hidden;
+      user-select: text;
+      cursor: text;
+    }
+
+    .note-meta {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.68;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .note button.delete-note {
+      position: absolute;
+      right: 7px;
+      top: 6px;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      line-height: 18px;
+      font-size: 14px;
+      border-radius: 50%;
+      opacity: 0;
+      background: rgba(255,255,255,0.65);
+    }
+
+    .note:hover button.delete-note,
+    .note.selected button.delete-note {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .legend {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: var(--panel);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(31, 31, 31, 0.12);
+      border-radius: 18px;
+      padding: 10px 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+      z-index: 8;
+      max-width: calc(100vw - 36px);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+    }
+
+    .dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      background: transparent;
+    }
+
+    .status {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      font-size: 13px;
+      opacity: 0.65;
+      background: var(--panel);
+      border: 1px solid rgba(31, 31, 31, 0.12);
+      border-radius: 18px;
+      padding: 10px 12px;
+      z-index: 8;
+    }
+
+    @media (max-width: 760px) {
+      html, body {
+        overflow: auto;
+      }
+
+      .app {
+        min-height: 100vh;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+
+      main {
+        min-height: 720px;
+        overflow: auto;
+      }
+
+      .board {
+        height: 720px;
+      }
+
+      .status {
+        left: 18px;
+        right: auto;
+        bottom: 70px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title">
+        <h1>SENEX · PUER · CYCLICA</h1>
+        <div class="subtitle">Drag sticky notes into the circles. Overlaps blend characteristics.</div>
+      </div>
+      <div class="toolbar">
+        <button id="addNote">+ Note</button>
+        <button id="exportData">Export</button>
+        <label class="import-label" for="importData">Import</label>
+        <input id="importData" type="file" accept="application/json" />
+        <button id="resetBoard" class="danger">Clear</button>
+      </div>
+    </header>
+
+    <main id="workspace">
+      <div class="board" id="board">
+        <svg class="venn" id="venn" viewBox="0 0 1000 680" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <circle id="senexCircle" class="circle-outline" cx="405" cy="300" r="205" stroke="var(--senex)" />
+          <circle id="puerCircle" class="circle-outline" cx="595" cy="300" r="205" stroke="var(--puer)" />
+          <circle id="cyclicaCircle" class="circle-outline" cx="500" cy="460" r="205" stroke="var(--cyclica)" />
+
+          <text class="circle-label" x="310" y="140" fill="var(--senex)">SENEX</text>
+          <text class="circle-label" x="690" y="140" fill="var(--puer)">PUER</text>
+          <text class="circle-label" x="500" y="625" fill="var(--cyclica)">CYCLICA</text>
+        </svg>
+
+        <div class="center-hint">Add a note, write an idea, then drag it into one or more circles.</div>
+
+        <div class="legend">
+          <span class="legend-item" style="color: var(--senex)"><span class="dot"></span>SENEX</span>
+          <span class="legend-item" style="color: var(--puer)"><span class="dot"></span>PUER</span>
+          <span class="legend-item" style="color: var(--cyclica)"><span class="dot"></span>CYCLICA</span>
+        </div>
+
+        <div class="status" id="status">Saved locally</div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "senex-puer-cyclica-board-v1";
+
+    const board = document.getElementById("board");
+    const workspace = document.getElementById("workspace");
+    const statusEl = document.getElementById("status");
+
+    const circles = [
+      { key: "SENEX", color: "#c73636", cx: 405, cy: 300, r: 205 },
+      { key: "PUER", color: "#d6a329", cx: 595, cy: 300, r: 205 },
+      { key: "CYCLICA", color: "#2f76d2", cx: 500, cy: 460, r: 205 },
+    ];
+
+    let notes = [];
+    let selectedId = null;
+    let zCounter = 10;
+
+    function uid() {
+      return "note-" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function boardRect() {
+      return board.getBoundingClientRect();
+    }
+
+    function screenToVenn(x, y) {
+      const rect = boardRect();
+      const scaleX = 1000 / rect.width;
+      const scaleY = 680 / rect.height;
+      return {
+        x: (x - rect.left) * scaleX,
+        y: (y - rect.top) * scaleY
+      };
+    }
+
+    function noteCenterInVenn(noteEl) {
+      const rect = noteEl.getBoundingClientRect();
+      return screenToVenn(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    }
+
+    function traitsForNote(noteEl) {
+      const p = noteCenterInVenn(noteEl);
+      return circles.filter(c => {
+        const dx = p.x - c.cx;
+        const dy = p.y - c.cy;
+        return Math.sqrt(dx * dx + dy * dy) <= c.r;
+      });
+    }
+
+    function describeTraits(traits) {
+      if (!traits.length) return "UNPLACED";
+      return traits.map(t => t.key).join(" · ");
+    }
+
+    function styleNoteByTraits(noteEl, traits) {
+      const meta = noteEl.querySelector(".note-meta span");
+      meta.textContent = describeTraits(traits);
+
+      if (traits.length === 0) {
+        noteEl.style.borderColor = "rgba(31,31,31,0.18)";
+        noteEl.style.background = "#fff7c8";
+        return;
+      }
+
+      if (traits.length === 1) {
+        const c = traits[0].color;
+        noteEl.style.borderColor = c;
+        noteEl.style.background = `linear-gradient(135deg, ${c}22, #fff7c8 46%, ${c}14)`;
+        return;
+      }
+
+      const colors = traits.map(t => t.color);
+      noteEl.style.borderColor = colors[0];
+      if (colors.length === 2) {
+        noteEl.style.background = `linear-gradient(135deg, ${colors[0]}2b, #fff7c8 44%, ${colors[1]}2b)`;
+      } else {
+        noteEl.style.background = `linear-gradient(135deg, ${colors[0]}2b, #fff7c8 33%, ${colors[1]}2b 64%, ${colors[2]}2b)`;
+      }
+    }
+
+    function save() {
+      const data = notes.map(n => ({
+        id: n.id,
+        text: n.text,
+        x: n.x,
+        y: n.y,
+        z: n.z,
+        rotation: n.rotation
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      statusEl.textContent = "Saved locally";
+    }
+
+    function autosize(textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = Math.max(70, textarea.scrollHeight) + "px";
+    }
+
+    function updateNoteModel(id, patch) {
+      const n = notes.find(note => note.id === id);
+      if (!n) return;
+      Object.assign(n, patch);
+      save();
+    }
+
+    function createNoteElement(note) {
+      const el = document.createElement("div");
+      el.className = "note";
+      el.dataset.id = note.id;
+      el.style.left = note.x + "px";
+      el.style.top = note.y + "px";
+      el.style.zIndex = note.z;
+      el.style.setProperty("--rotation", `${note.rotation}deg`);
+
+      el.innerHTML = `
+        <button class="delete-note" title="Delete note">×</button>
+        <textarea spellcheck="true" placeholder="Write idea..."></textarea>
+        <div class="note-meta"><span>UNPLACED</span><span>drag</span></div>
+      `;
+
+      const textarea = el.querySelector("textarea");
+      textarea.value = note.text || "";
+      autosize(textarea);
+
+      textarea.addEventListener("input", () => {
+        autosize(textarea);
+        updateNoteModel(note.id, { text: textarea.value });
+      });
+
+      textarea.addEventListener("pointerdown", ev => {
+        ev.stopPropagation();
+      });
+
+      el.querySelector(".delete-note").addEventListener("click", ev => {
+        ev.stopPropagation();
+        deleteNote(note.id);
+      });
+
+      el.addEventListener("pointerdown", startDrag);
+
+      board.appendChild(el);
+      requestAnimationFrame(() => styleNoteByTraits(el, traitsForNote(el)));
+      return el;
+    }
+
+    function render() {
+      board.querySelectorAll(".note").forEach(el => el.remove());
+      notes.forEach(createNoteElement);
+      updateSelected();
+    }
+
+    function addNote(text = "") {
+      const rect = boardRect();
+      const note = {
+        id: uid(),
+        text,
+        x: clamp(rect.width / 2 - 85 + Math.random() * 40, 20, rect.width - 200),
+        y: clamp(rect.height / 2 - 55 + Math.random() * 40, 90, rect.height - 160),
+        z: ++zCounter,
+        rotation: Math.round((Math.random() * 4 - 2) * 10) / 10
+      };
+      notes.push(note);
+      createNoteElement(note);
+      selectedId = note.id;
+      updateSelected();
+      save();
+      const el = board.querySelector(`[data-id="${note.id}"] textarea`);
+      if (el) el.focus();
+    }
+
+    function deleteNote(id) {
+      notes = notes.filter(n => n.id !== id);
+      const el = board.querySelector(`[data-id="${id}"]`);
+      if (el) el.remove();
+      if (selectedId === id) selectedId = null;
+      save();
+    }
+
+    function updateSelected() {
+      board.querySelectorAll(".note").forEach(el => {
+        el.classList.toggle("selected", el.dataset.id === selectedId);
+      });
+    }
+
+    function startDrag(ev) {
+      if (ev.button !== undefined && ev.button !== 0) return;
+
+      const el = ev.currentTarget;
+      const id = el.dataset.id;
+      selectedId = id;
+      zCounter += 1;
+      el.style.zIndex = zCounter;
+      updateNoteModel(id, { z: zCounter });
+      updateSelected();
+
+      const note = notes.find(n => n.id === id);
+      const rect = boardRect();
+
+      const startX = ev.clientX;
+      const startY = ev.clientY;
+      const initialX = note.x;
+      const initialY = note.y;
+
+      el.setPointerCapture(ev.pointerId);
+
+      function move(moveEv) {
+        const dx = moveEv.clientX - startX;
+        const dy = moveEv.clientY - startY;
+        const newX = clamp(initialX + dx, 8, rect.width - el.offsetWidth - 8);
+        const newY = clamp(initialY + dy, 8, rect.height - el.offsetHeight - 8);
+
+        note.x = newX;
+        note.y = newY;
+        el.style.left = newX + "px";
+        el.style.top = newY + "px";
+        styleNoteByTraits(el, traitsForNote(el));
+        statusEl.textContent = describeTraits(traitsForNote(el));
+      }
+
+      function up() {
+        el.removeEventListener("pointermove", move);
+        el.removeEventListener("pointerup", up);
+        el.removeEventListener("pointercancel", up);
+        updateNoteModel(id, { x: note.x, y: note.y, z: zCounter });
+        styleNoteByTraits(el, traitsForNote(el));
+      }
+
+      el.addEventListener("pointermove", move);
+      el.addEventListener("pointerup", up);
+      el.addEventListener("pointercancel", up);
+    }
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          notes = [];
+          return;
+        }
+        const parsed = JSON.parse(raw);
+        notes = Array.isArray(parsed) ? parsed : [];
+        zCounter = notes.reduce((m, n) => Math.max(m, Number(n.z) || 10), 10);
+      } catch {
+        notes = [];
+      }
+    }
+
+    function exportData() {
+      const payload = {
+        app: "SENEX-PUER-CYCLICA",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        notes
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "senex-puer-cyclica-board.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    async function importData(file) {
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        const imported = Array.isArray(parsed) ? parsed : parsed.notes;
+        if (!Array.isArray(imported)) throw new Error("No notes array found.");
+        notes = imported.map(n => ({
+          id: n.id || uid(),
+          text: String(n.text || ""),
+          x: Number(n.x) || 120,
+          y: Number(n.y) || 120,
+          z: Number(n.z) || ++zCounter,
+          rotation: Number(n.rotation) || 0
+        }));
+        save();
+        render();
+      } catch (err) {
+        alert("Could not import this file. Make sure it is a valid exported board JSON.");
+      }
+    }
+
+    document.getElementById("addNote").addEventListener("click", () => addNote());
+    document.getElementById("exportData").addEventListener("click", exportData);
+    document.getElementById("importData").addEventListener("change", ev => importData(ev.target.files[0]));
+    document.getElementById("resetBoard").addEventListener("click", () => {
+      const ok = confirm("Clear all notes from this board?");
+      if (!ok) return;
+      notes = [];
+      selectedId = null;
+      save();
+      render();
+    });
+
+    workspace.addEventListener("pointerdown", ev => {
+      if (ev.target === workspace || ev.target === board) {
+        selectedId = null;
+        updateSelected();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      board.querySelectorAll(".note").forEach(el => styleNoteByTraits(el, traitsForNote(el)));
+    });
+
+    window.addEventListener("keydown", ev => {
+      if ((ev.key === "Delete" || ev.key === "Backspace") && selectedId) {
+        const active = document.activeElement;
+        if (active && active.tagName === "TEXTAREA") return;
+        deleteNote(selectedId);
+      }
+      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === "n") {
+        ev.preventDefault();
+        addNote();
+      }
+    });
+
+    load();
+    render();
+
+    if (notes.length === 0) {
+      addNote("Example idea");
+      const created = notes[0];
+      created.x = 420;
+      created.y = 280;
+      save();
+      render();
+    }
+  </script>
+</body>
+</html>
